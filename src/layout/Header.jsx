@@ -12,25 +12,32 @@ import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { Logo } from '../components/Logo';
 import { Search } from '../components/Search';
-
-const user = false;
+import { useDispatch, useSelector } from 'react-redux';
+import { selectAuthInfo, logOut as leaveAcc } from '../features/auth/authSlice';
 
 export const Header = () => {
+    const dispatch = useDispatch();
+    const authInfo = useSelector(selectAuthInfo);
+
+    const { username } = authInfo;
+
+    const logOut = () => dispatch(leaveAcc());
+
     return (
         <Box>
             <AppBar position='static'>
                 <Toolbar>
                     <Logo />
                     <Search />
-                    {user ? (
+                    {username ? (
                         <>
                             <IconButton size='large' color='inherit'>
                                 <AccountCircle />
                             </IconButton>
                             <Typography variant='h6' component='span'>
-                                User name
+                                {username}
                             </Typography>
-                            <IconButton size='large' color='inherit'>
+                            <IconButton onClick={logOut} size='large' color='inherit'>
                                 <LogoutIcon />
                             </IconButton>
                         </>

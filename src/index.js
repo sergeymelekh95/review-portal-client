@@ -1,5 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+import { store, persistor } from './store';
 import './index.css';
 import { App } from './App';
 import { BrowserRouter } from 'react-router-dom';
@@ -19,11 +22,15 @@ import { BrowserRouter } from 'react-router-dom';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-    <React.StrictMode>
-        {/* <ThemeProvider theme={theme}> */}
+    <>
+        <Provider store={store}>
+            {/* <ThemeProvider theme={theme}> */}
             <BrowserRouter>
-                <App />
+                <PersistGate loading={null} persistor={persistor}>
+                    <App />
+                </PersistGate>
             </BrowserRouter>
-        {/* </ThemeProvider> */}
-    </React.StrictMode>
+            {/* </ThemeProvider> */}
+        </Provider>
+    </>
 );

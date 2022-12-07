@@ -1,26 +1,17 @@
-import { useForm } from 'react-hook-form';
-import {
-    Button,
-    TextField,
-    Link,
-    Box,
-    Container,
-    IconButton,
-} from '@mui/material';
+import { TextField, Link, Box, Container, IconButton } from '@mui/material';
 import { NavLink } from 'react-router-dom';
 import GoogleIcon from '@mui/icons-material/Google';
 import FacebookIcon from '@mui/icons-material/Facebook';
-import { LoginWrapper } from '../components/LoginWrapper';
+import { LoginWrapper } from '../../components/LoginWrapper';
+import { ErrorText } from '../../components/ErrorText';
+import LoadingButton from '@mui/lab/LoadingButton';
+import { useAuth } from './useAuth';
 
 export const SignIn = () => {
-    const {
-        register,
-        handleSubmit,
-        watch,
-        formState: { errors },
-    } = useForm();
-
-    const onSubmit = (data) => console.log(data);
+    const [error, errors, register, handleSubmit, onSubmit, status] = useAuth(
+        '/',
+        'singIn'
+    );
 
     return (
         <LoginWrapper title='Sign in'>
@@ -36,8 +27,18 @@ export const SignIn = () => {
                     label='Email Address'
                     name='email'
                     autoComplete='email'
-                    {...register('email', { required: true })}
+                    error={!!errors.email?.message}
+                    {...register('email', {
+                        required: true,
+                        pattern: {
+                            value: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+                            message: 'Please enter a valid email',
+                        },
+                    })}
                 />
+                {errors.email?.message && (
+                    <ErrorText error={errors.email?.message} />
+                )}
                 <TextField
                     margin='normal'
                     fullWidth
@@ -46,8 +47,18 @@ export const SignIn = () => {
                     type='password'
                     id='password'
                     autoComplete='current-password'
-                    {...register('password', { required: true })}
+                    error={!!errors.password?.message}
+                    {...register('password', {
+                        required: true,
+                        minLength: {
+                            value: 5,
+                            message: 'password should be at least 5',
+                        },
+                    })}
                 />
+                {errors.password?.message && (
+                    <ErrorText error={errors.password?.message} />
+                )}
                 <Container>
                     <IconButton size='large' color='primary'>
                         <GoogleIcon />
@@ -56,14 +67,16 @@ export const SignIn = () => {
                         <FacebookIcon />
                     </IconButton>
                 </Container>
-                <Button
+                {error && <ErrorText error={error} />}
+                <LoadingButton
                     type='submit'
                     fullWidth
                     variant='contained'
+                    loading={status === 'loading'}
                     sx={{ mt: 3, mb: 2 }}
                 >
                     Sign In
-                </Button>
+                </LoadingButton>
                 <Link to={`/signUp`} component={NavLink} variant='body2'>
                     {"Don't have an account? Sign Up"}
                 </Link>
